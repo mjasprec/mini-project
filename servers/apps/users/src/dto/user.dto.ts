@@ -15,7 +15,7 @@ export class RegisterDto {
   @Field()
   @IsNotEmpty({ message: 'Username is required.' })
   @MinLength(6, { message: 'Username must be at least 6 characters' })
-  userName: string;
+  username: string;
 
   @Field()
   @IsNotEmpty({ message: 'Email is required.' })
@@ -32,7 +32,7 @@ export class RegisterDto {
 export class LoginDto {
   @Field()
   @IsNotEmpty({ message: 'Username is required.' })
-  userName: string;
+  username: string;
 
   @Field()
   @IsNotEmpty({ message: 'Password is required.' })

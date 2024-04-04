@@ -17,24 +17,26 @@ export class UsersService {
     registerDto: RegisterDto,
     // response: Response
   ) {
-    const { firstName, lastName, email, userName, password } = registerDto;
+    const { firstName, lastName, email, username, password } = registerDto;
 
-    const newUser = {
-      firstName,
-      lastName,
-      email,
-      userName,
-      password,
-    };
+    const user = await this.prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        username,
+        password,
+      },
+    });
 
-    return newUser;
+    return user;
   }
 
   async login(loginDto: LoginDto) {
-    const { userName, password } = loginDto;
+    const { username, password } = loginDto;
 
     const user = {
-      userName,
+      username,
       password,
     };
 
@@ -42,25 +44,6 @@ export class UsersService {
   }
 
   async getUsers() {
-    const users = [
-      {
-        id: 1,
-        firstName: 'Leanne Graham',
-        lastName: '',
-        username: 'Bret',
-        email: 'Sincere@april.biz',
-        password: '',
-      },
-      {
-        id: 2,
-        firstName: 'Ervin',
-        lastName: 'Graham',
-        username: 'Antonette',
-        email: 'Shanna@melissa.tv',
-        password: '',
-      },
-    ];
-
-    return users;
+    return this.prisma.user.findMany({});
   }
 }

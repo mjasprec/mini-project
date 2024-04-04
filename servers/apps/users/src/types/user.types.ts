@@ -10,13 +10,13 @@ export class ErrorType {
   code: string;
 }
 
-ObjectType();
+@ObjectType()
 export class RegisterResponse {
   @Field(() => User, { nullable: true })
   user?: User | any;
 
-  @Field(() => ErrorType, { nullable: true })
-  error?: ErrorType | any;
+  // @Field(() => ErrorType, { nullable: true })
+  // error?: ErrorType;
 }
 
 ObjectType();
