@@ -20,14 +20,47 @@ model Avatars {
   userId    String @unique @db.ObjectId
 }
 
+model Comment {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @unique @db.ObjectId
+  text String
+  nft Nft @relation(fields: [nftId], references: [id])
+  nftId String @unique @db.ObjectId
+}
+
+model Nft {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String @unique
+  description   String
+  price         Float
+  imgUrl        String
+  user          User   @relation(fields: [userId], references: [id])
+  userId        String @unique @db.ObjectId
+  comment       Comment[]
+}
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName    String
   lastName     String
   email        String   @unique
+  username     String   @unique
   password     String
+  about        String?
+  gender       String?
+  birthday     DateTime?
+  wallet       Float?
+  nfts         Nft[] 
   avatar       Avatars?
   role         Role     @default(User)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+// npx prisma db push / npx prisma studio
+// new
+  // username     String
+  // about_me     String
+  // gender       String
+  // birthday     DateTime
+  // wallet       Float
+  // nfts         Nft[]

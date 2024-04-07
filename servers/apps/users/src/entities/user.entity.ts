@@ -17,6 +17,47 @@ export class Avatars {
 }
 
 @ObjectType()
+@Directive('@key(fields:"id")')
+export class Comment {
+  @Field()
+  id: string;
+
+  @Field()
+  text: string;
+
+  @Field()
+  nftId: string;
+
+  @Field()
+  userId: string;
+}
+
+@ObjectType()
+@Directive('@key(fields:"id")')
+export class Nft {
+  @Field()
+  id: string;
+
+  @Field()
+  imgUrl: string;
+
+  @Field()
+  userId: string;
+
+  @Field()
+  price: number;
+
+  @Field()
+  name: string;
+
+  @Field()
+  description: string;
+
+  @Field(() => Comment, { nullable: true })
+  comments?: Comment | null;
+}
+
+@ObjectType()
 export class User {
   @Field()
   id: string;
@@ -38,6 +79,21 @@ export class User {
 
   @Field(() => Avatars, { nullable: true })
   avatar?: Avatars | null;
+
+  @Field()
+  about: string;
+
+  @Field(() => Avatars, { nullable: true })
+  gender: string | null;
+
+  @Field()
+  birthday?: Date;
+
+  @Field()
+  wallet: number;
+
+  @Field(() => Nft, { nullable: true })
+  nfts?: Nft | null;
 
   @Field()
   role: string;
