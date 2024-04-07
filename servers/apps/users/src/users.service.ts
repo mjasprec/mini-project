@@ -6,6 +6,13 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto, RegisterDto } from './dto/user.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+}
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -41,21 +48,56 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const defaultBalance = 10000;
 
-    const user = await this.prisma.user.create({
-      data: {
-        firstName,
-        lastName,
-        email,
-        username,
-        password: hashedPassword,
-        about,
-        gender,
-        birthday,
-        wallet: defaultBalance,
-      },
-    });
+    // const user = await this.prisma.user.create({
+    //   data: {
+    //     firstName,
+    //     lastName,
+    //     email,
+    //     username,
+    //     password: hashedPassword,
+    //     about,
+    //     gender,
+    //     birthday,
+    //     wallet: defaultBalance,
+    //   },
+    // });
+
+    const user = {
+      firstName,
+      lastName,
+      email,
+      username,
+      password: hashedPassword,
+      about,
+      gender,
+      birthday,
+      wallet: defaultBalance,
+    };
+
+    const activationToken = await this.createActivationToken(user);
+
+    const activationCode = activationToken.activationCode;
+
+    console.log(activationCode);
 
     return { user, response };
+  }
+
+  async createActivationToken(user: UserData) {
+    const activationCode = Math.floor(1000 + Math.random() * 900).toString();
+
+    const token = this.jwtService.sign(
+      {
+        user,
+        activationCode,
+      },
+      {
+        secret: this.configService.get<string>('ACTIVATION_SECRET'),
+        expiresIn: '5m',
+      },
+    );
+
+    return { token, activationCode };
   }
 
   async login(loginDto: LoginDto) {
