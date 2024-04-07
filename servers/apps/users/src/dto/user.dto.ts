@@ -27,8 +27,8 @@ export class RegisterDto {
   @MinLength(8, { message: 'Password must be at least 8 characters' })
   password: string;
 
-  @Field()
-  about: string;
+  @Field({ nullable: true })
+  about?: string;
 
   @Field(() => String, { defaultValue: 'male' })
   gender?: string;
@@ -37,7 +37,7 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'Birthday is required.' })
   birthday?: Date;
 
-  @Field()
+  @Field({ nullable: true })
   wallet?: number;
 }
 

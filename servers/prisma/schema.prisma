@@ -45,10 +45,10 @@ model User {
   email        String   @unique
   username     String   @unique
   password     String
-  about        String?
-  gender       String?
-  birthday     DateTime?
-  wallet       Float?
+  about        String
+  gender       String
+  birthday     DateTime
+  wallet       Float
   nfts         Nft[] 
   avatar       Avatars?
   role         Role     @default(User)

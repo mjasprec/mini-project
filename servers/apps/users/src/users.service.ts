@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { ActivationDto, LoginDto, RegisterDto } from './dto/user.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { EmailService } from './email/email.service';
+import { TokenSender } from './utils/sendToken';
 
 interface UserData {
   firstName: string;
@@ -13,6 +14,10 @@ interface UserData {
   email: string;
   username: string;
   password: string;
+  about: string;
+  gender: string;
+  birthday: Date;
+  wallet: number;
 }
 
 @Injectable()
@@ -34,6 +39,7 @@ export class UsersService {
       about,
       gender,
       birthday,
+      wallet,
     } = registerDto;
 
     const isEmailExist = await this.prisma.user.findUnique({
@@ -49,7 +55,6 @@ export class UsersService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const defaultBalance = 10000;
 
     const user = {
       firstName,
@@ -60,7 +65,7 @@ export class UsersService {
       about,
       gender,
       birthday,
-      wallet: defaultBalance,
+      wallet,
     };
 
     const activationToken = await this.createActivationToken(user);
@@ -109,7 +114,17 @@ export class UsersService {
       throw new BadRequestException('Invalid activation code');
     }
 
-    const { email, username, password, firstName, lastName } = newUser.user;
+    const {
+      email,
+      username,
+      password,
+      firstName,
+      lastName,
+      about,
+      gender,
+      birthday,
+      wallet,
+    } = newUser.user;
 
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -120,7 +135,17 @@ export class UsersService {
     }
 
     const user = await this.prisma.user.create({
-      data: { firstName, lastName, email, username, password },
+      data: {
+        firstName,
+        lastName,
+        email,
+        username,
+        password,
+        about,
+        gender,
+        birthday,
+        wallet,
+      },
     });
 
     return { user, response };
@@ -129,12 +154,32 @@ export class UsersService {
   async login(loginDto: LoginDto) {
     const { username, password } = loginDto;
 
-    const user = {
-      username,
-      password,
-    };
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
 
-    return user;
+    if (user && (await this.comparePassword(password, user.password))) {
+      const tokenSender = new TokenSender(this.configService, this.jwtService);
+      return tokenSender.sendToken(user);
+    } else {
+      return {
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+        error: {
+          message: 'Invalid email or password',
+        },
+      };
+    }
+  }
+
+  async comparePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
   }
 
   async getUsers() {

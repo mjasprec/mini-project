@@ -83,8 +83,8 @@ export class User {
   @Field()
   about: string;
 
-  @Field(() => Avatars, { nullable: true })
-  gender: string | null;
+  @Field(() => String, { defaultValue: 'male' })
+  gender: string;
 
   @Field()
   birthday?: Date;
