@@ -175,13 +175,20 @@ export class UsersService {
     }
   }
 
+  async logout(req: any) {
+    console.log('REQ', req);
+
+    req.refreshtoken = null;
+    req.accesstoken = null;
+    req.user = null;
+    return { message: 'Logged out successfully!' };
+  }
+
   async getLoggedInUser(req: any) {
-    console.log('getLoggedInUser', req);
     const user = req.user;
     const accessToken = req.accesstoken;
     const refreshToken = req.refreshtoken;
 
-    console.log({ user, accessToken, refreshToken });
     return { user, accessToken, refreshToken };
   }
 
