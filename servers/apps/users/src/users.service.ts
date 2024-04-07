@@ -175,6 +175,16 @@ export class UsersService {
     }
   }
 
+  async getLoggedInUser(req: any) {
+    console.log('getLoggedInUser', req);
+    const user = req.user;
+    const accessToken = req.accesstoken;
+    const refreshToken = req.refreshtoken;
+
+    console.log({ user, accessToken, refreshToken });
+    return { user, accessToken, refreshToken };
+  }
+
   async comparePassword(
     password: string,
     hashedPassword: string,
