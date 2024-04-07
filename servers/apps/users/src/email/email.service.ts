@@ -4,20 +4,18 @@ import { Injectable } from '@nestjs/common';
 type mailOptions = {
   subject: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   activationCode: string;
   template: string;
 };
+
 @Injectable()
 export class EmailService {
   constructor(private mailService: MailerService) {}
-
   async sendMail({
     subject,
     email,
-    firstName,
-    lastName,
+    name,
     activationCode,
     template,
   }: mailOptions) {
@@ -26,8 +24,7 @@ export class EmailService {
       subject,
       template,
       context: {
-        firstName,
-        lastName,
+        name,
         activationCode,
       },
     });
