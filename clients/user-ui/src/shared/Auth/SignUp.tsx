@@ -1,12 +1,13 @@
 'use client';
+import { REGISTER_USER } from '@/graphql/actions/register.action';
 import styles from '@/utils/styles';
+import { useMutation } from '@apollo/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { z } from 'zod';
-
-const GENDER = ['male', 'female'] as const;
 
 const formSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -15,9 +16,9 @@ const formSchema = z.object({
   username: z.string().min(6, 'Username must be at least 6 characters'),
   password: z.string().min(6, 'Username must be at least 6 characters'),
   about: z.string().max(64, 'About cannot exceed 64 characters'),
-  gender: z.enum(GENDER),
-  birthday: z.coerce.date(),
-  wallet: z.coerce.string(),
+  gender: z.string(),
+  birthday: z.string(),
+  wallet: z.string(),
 });
 
 type SignUpFormSchema = z.infer<typeof formSchema>;
@@ -27,6 +28,8 @@ type SignUpPropType = {
 };
 
 function SignUp({ setActiveState }: SignUpPropType) {
+  const [RegisterUser, { loading, error, data }] = useMutation(REGISTER_USER);
+
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -38,9 +41,20 @@ function SignUp({ setActiveState }: SignUpPropType) {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: SignUpFormSchema) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (data: SignUpFormSchema) => {
+    // console.log('data', data);
+    // reset();
+    try {
+      console.log('try', data);
+      const response = await RegisterUser({
+        variables: data,
+      });
+      console.log(response.data);
+      toast.success(response.data.message);
+    } catch (error: any) {
+      console.log('error', error);
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -199,10 +213,10 @@ function SignUp({ setActiveState }: SignUpPropType) {
             <div className='w-full flex flex-row gap-3   mb-1 '>
               <div>
                 <input
+                  {...register('gender')}
                   type='radio'
                   name='gender'
                   value='male'
-                  checked
                 />
                 <label
                   htmlFor='male'
@@ -214,6 +228,7 @@ function SignUp({ setActiveState }: SignUpPropType) {
 
               <div>
                 <input
+                  {...register('gender')}
                   type='radio'
                   name='gender'
                   value='female'
@@ -258,7 +273,7 @@ function SignUp({ setActiveState }: SignUpPropType) {
           </label>
           <input
             {...register('wallet')}
-            type='number'
+            type='text'
             name='wallet'
             className={`${styles.input}`}
           />
@@ -268,13 +283,13 @@ function SignUp({ setActiveState }: SignUpPropType) {
             </span>
           ) : null}
         </div>
+
         <div className='w-full mt-3'>
           <input
             type='submit'
             value='Sign Up'
-            disabled={isSubmitting}
+            disabled={isSubmitting || loading}
             className={`${styles.button} mt-3`}
-            onClick={() => alert('Sign Up')}
           />
         </div>
 
