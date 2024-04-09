@@ -8,9 +8,9 @@ export const REGISTER_USER: DocumentNode = gql`
     $password: String!
     $email: String!
     $username: String!
-    $about: String!
+    $birthday: DateTime!
     $gender: String!
-    $birthday: String!
+    $about: String!
     $wallet: Float!
   ) {
     register(
@@ -20,9 +20,9 @@ export const REGISTER_USER: DocumentNode = gql`
         password: $password
         email: $email
         username: $username
-        about: $about
-        gender: $gender
         birthday: $birthday
+        gender: $gender
+        about: $about
         wallet: $wallet
       }
     ) {

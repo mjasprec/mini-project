@@ -15,20 +15,20 @@ const formSchema = z.object({
   email: z.string().email(),
   username: z.string().min(6, 'Username must be at least 6 characters'),
   password: z.string().min(6, 'Username must be at least 6 characters'),
-  about: z.string().max(64, 'About cannot exceed 64 characters'),
+  about: z.string().min(16, 'About must be at least 16 characters'),
+  birthday: z.coerce.date(),
   gender: z.string(),
-  birthday: z.string(),
-  wallet: z.string(),
+  wallet: z.coerce.number().nonnegative(),
 });
 
-type SignUpFormSchema = z.infer<typeof formSchema>;
+type SignUpSchema = z.infer<typeof formSchema>;
 
 type SignUpPropType = {
   setActiveState: Dispatch<SetStateAction<string>>;
 };
 
 function SignUp({ setActiveState }: SignUpPropType) {
-  const [RegisterUser, { loading, error, data }] = useMutation(REGISTER_USER);
+  const [registerUserMutation, { loading }] = useMutation(REGISTER_USER);
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -37,22 +37,23 @@ function SignUp({ setActiveState }: SignUpPropType) {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<SignUpFormSchema>({
+  } = useForm<SignUpSchema>({
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data: SignUpFormSchema) => {
-    // console.log('data', data);
-    // reset();
+  const onSubmit = async (data: SignUpSchema) => {
     try {
-      console.log('try', data);
-      const response = await RegisterUser({
+      const response = await registerUserMutation({
         variables: data,
       });
-      console.log(response.data);
-      toast.success(response.data.message);
+      localStorage.setItem(
+        'activation_token',
+        response.data.register.activation_token
+      );
+      toast.success('Please check your email to activate your account.');
+      reset();
+      setActiveState('Verification');
     } catch (error: any) {
-      console.log('error', error);
       toast.error(error.message);
     }
   };
@@ -165,13 +166,13 @@ function SignUp({ setActiveState }: SignUpPropType) {
 
             {!showPassword ? (
               <AiOutlineEyeInvisible
-                className='absolute bottom-3 right-2 z-10 cursor-pointer'
+                className='absolute bottom-2 right-2 z-10 cursor-pointer'
                 size={20}
                 onClick={() => setShowPassword(true)}
               />
             ) : (
               <AiOutlineEye
-                className='absolute bottom-3 right-2 z-10 cursor-pointer'
+                className='absolute top-[35%] right-2 z-10 cursor-pointer'
                 size={20}
                 onClick={() => setShowPassword(false)}
               />

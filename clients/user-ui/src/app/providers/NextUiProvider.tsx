@@ -1,6 +1,5 @@
 // app/providers.tsx
 'use client';
-
 import { graphqlClient } from '@/graphql/gql.setup';
 import { ApolloProvider } from '@apollo/client';
 import { NextUIProvider } from '@nextui-org/react';
