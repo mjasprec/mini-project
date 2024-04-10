@@ -55,6 +55,7 @@ function SignIn({ setActiveState, setIsModalOpen }: SignInPropType) {
         setIsModalOpen(false);
         toast.success('Login successfully!');
         reset();
+        window.location.reload();
       } else if (error) {
         toast.error(error.message);
       } else {
