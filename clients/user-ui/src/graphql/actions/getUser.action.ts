@@ -16,6 +16,9 @@ export const GET_USER: DocumentNode = gql`
         gender
         wallet
         avatar {
+          public_id
+          userId
+          id
           url
         }
         nfts {

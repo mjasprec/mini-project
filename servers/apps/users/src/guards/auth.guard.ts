@@ -29,13 +29,23 @@ export class AuthGuard implements CanActivate {
     }
 
     if (accessToken) {
-      const decoded = this.jwtService.decode(accessToken);
+      // const decoded = this.jwtService.decode(accessToken);
 
-      const expirationTime = decoded?.exp;
+      // const expirationTime = decoded?.exp;
 
-      if (expirationTime * 1000 < Date.now()) {
-        await this.updateAccessToken(req);
+      // if (expirationTime * 1000 < Date.now()) {
+      //   await this.updateAccessToken(req);
+      // }
+
+      const decode = this.jwtService.verify(accessToken, {
+        secret: this.config.get<string>('ACCESS_TOKEN_SECRET'),
+      });
+
+      if (!decode) {
+        throw new UnauthorizedException('Invalid access token');
       }
+
+      await this.updateAccessToken(req);
     }
 
     return true;
@@ -45,20 +55,26 @@ export class AuthGuard implements CanActivate {
     try {
       const refreshTokenData = req.headers.refreshtoken as string;
 
-      const decoded = this.jwtService.decode(refreshTokenData);
+      // const decoded = this.jwtService.decode(refreshTokenData);
 
-      const expirationTime = decoded.exp * 1000;
+      // const expirationTime = decoded.exp * 1000;
 
-      if (expirationTime < Date.now()) {
-        throw new UnauthorizedException(
-          'Please login to access this resource!',
-        );
+      // if (expirationTime < Date.now()) {
+      //   throw new UnauthorizedException(
+      //     'Please login to access this resource!',
+      //   );
+      // }
+
+      const decode = this.jwtService.verify(refreshTokenData, {
+        secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
+      });
+
+      if (!decode) {
+        throw new UnauthorizedException('Invalid refresh token');
       }
 
       const user = await this.prisma.user.findUnique({
-        where: {
-          id: decoded.id,
-        },
+        where: { id: decode.id },
       });
 
       const accessToken = this.jwtService.sign(

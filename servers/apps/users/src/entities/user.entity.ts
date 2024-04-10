@@ -1,4 +1,5 @@
 import { ObjectType, Field, Directive } from '@nestjs/graphql';
+import { Nft } from './nft.entity';
 
 @ObjectType()
 @Directive('@key(fields:"id")')
@@ -14,47 +15,6 @@ export class Avatars {
 
   @Field()
   userId: string;
-}
-
-@ObjectType()
-@Directive('@key(fields:"id")')
-export class Comment {
-  @Field()
-  id: string;
-
-  @Field()
-  text: string;
-
-  @Field()
-  nftId: string;
-
-  @Field()
-  userId: string;
-}
-
-@ObjectType()
-@Directive('@key(fields:"id")')
-export class Nft {
-  @Field()
-  id: string;
-
-  @Field()
-  imgUrl: string;
-
-  @Field()
-  userId: string;
-
-  @Field()
-  price: number;
-
-  @Field()
-  name: string;
-
-  @Field()
-  description: string;
-
-  @Field(() => Comment, { nullable: true })
-  comments?: Comment | null;
 }
 
 @ObjectType()
@@ -92,8 +52,8 @@ export class User {
   @Field()
   wallet: number;
 
-  @Field(() => Nft, { nullable: true })
-  nfts?: Nft | null;
+  @Field(() => [Nft], { nullable: 'items' })
+  nfts: Nft[];
 
   @Field()
   role: string;

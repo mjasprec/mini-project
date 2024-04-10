@@ -187,6 +187,8 @@ export class UsersService {
     const accessToken = req.accesstoken;
     const refreshToken = req.refreshtoken;
 
+    console.log('getLoggedInUser', user);
+
     return { user, accessToken, refreshToken };
   }
 
