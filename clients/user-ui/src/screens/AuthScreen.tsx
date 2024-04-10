@@ -25,7 +25,10 @@ function AuthScreen({ setIsModalOpen }: AuthScreenType) {
     >
       <div className='w-[38%] h-auto bg-slate-900 rounded shadow-sm p-5'>
         {activeState === 'sign-in' ? (
-          <SignIn setActiveState={setActiveState} />
+          <SignIn
+            setActiveState={setActiveState}
+            setIsModalOpen={setIsModalOpen}
+          />
         ) : null}
 
         {activeState === 'sign-up' ? (

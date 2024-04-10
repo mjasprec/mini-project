@@ -1,10 +1,14 @@
 'use client';
+import { LOGIN_USER } from '@/graphql/actions/login.action';
 import styles from '@/utils/styles';
+import { useMutation } from '@apollo/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { z } from 'zod';
+import Cookies from 'js-cookie';
 
 const formSchema = z.object({
   username: z.string().min(6, 'Username must be at least 6 characters'),
@@ -15,10 +19,13 @@ type SignInSchema = z.infer<typeof formSchema>;
 
 type SignInPropType = {
   setActiveState: Dispatch<SetStateAction<string>>;
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-function SignIn({ setActiveState }: SignInPropType) {
+function SignIn({ setActiveState, setIsModalOpen }: SignInPropType) {
   const [showPassword, setShowPassword] = useState(false);
+
+  const [login, { loading }] = useMutation(LOGIN_USER);
 
   const {
     register,
@@ -29,9 +36,33 @@ function SignIn({ setActiveState }: SignInPropType) {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: SignInSchema) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (data: SignInSchema) => {
+    try {
+      const loginCredentials = {
+        username: data.username,
+        password: data.password,
+      };
+
+      const {
+        data: {
+          login: { user, error, accessToken, refreshToken },
+        },
+      } = await login({ variables: loginCredentials });
+
+      if (user) {
+        Cookies.set('access_token', accessToken, { expires: 1 });
+        Cookies.set('refresh_token', refreshToken, { expires: 7 });
+        setIsModalOpen(false);
+        toast.success('Login successfully!');
+        reset();
+      } else if (error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Something went wrong. Please try again.');
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -101,7 +132,7 @@ function SignIn({ setActiveState }: SignInPropType) {
           <input
             type='submit'
             value='Sign In'
-            disabled={isSubmitting}
+            disabled={isSubmitting || loading}
             className={`${styles.button} mt-3`}
           />
         </div>
