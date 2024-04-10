@@ -64,7 +64,7 @@ function ProfileDropDown() {
         />
       )}
 
-      {isModalOpen ? <AuthScreen /> : null}
+      {isModalOpen ? <AuthScreen setIsModalOpen={setIsModalOpen} /> : null}
     </div>
   );
 }
