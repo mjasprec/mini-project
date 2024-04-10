@@ -176,8 +176,6 @@ export class UsersService {
   }
 
   async logout(req: any) {
-    console.log('REQ', req);
-
     req.refreshtoken = null;
     req.accesstoken = null;
     req.user = null;
