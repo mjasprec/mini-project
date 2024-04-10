@@ -52,7 +52,7 @@ function SignUp({ setActiveState }: SignUpPropType) {
       );
       toast.success('Please check your email to activate your account.');
       reset();
-      setActiveState('Verification');
+      setActiveState('verification');
     } catch (error: any) {
       toast.error(error.message);
     }
